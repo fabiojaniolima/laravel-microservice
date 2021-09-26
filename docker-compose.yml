@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+    db:
+        container_name: micro-videos-db
+        image: mysql:8.0
+        environment:
+            MYSQL_DATABASE: micro-videos
+            MYSQL_USER: app_user
+            MYSQL_PASSWORD: secret-pw
+            MYSQL_ROOT_PASSWORD: secret-pw
+        restart: on-failure
+        user: mysql
+        ports:
+            - "3306:3306"
+        volumes:
+            - db-data:/var/lib/mysql
+        healthcheck:
+            test: mysqladmin -u root -p'$$MYSQL_ROOT_PASSWORD' ping -h localhost
+            interval: 1s
+            timeout: 10s
+            start_period: 5s
+            retries: 30
+    app:
+        container_name: micro-videos-app
+        image: fabiojanio/php:8.0-alpine3.14
+        volumes:
+            - ./:/app
+        working_dir: /app
+        restart: on-failure
+        user: www-data
+        ports:
+            - "8080:80"
+        depends_on:
+            db:
+                condition: service_healthy
+        command: >
+            sh -c "php artisan migrate
+            && php artisan serve --host=0.0.0.0 --port=80"
+
+volumes:
+    db-data:
+
+networks:
+    default:
+        driver: bridge

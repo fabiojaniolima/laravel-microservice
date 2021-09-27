@@ -36,15 +36,11 @@ class CategoryController extends Controller
             'description' => 'string',
         ]);
 
-        $category->update($request->all());
-
-        return response()->noContent();
+        return $category->update($request->all());
     }
 
     public function destroy(Category $category)
     {
-        $category->delete();
-
-        return response()->noContent();
+        return $category->delete();
     }
 }

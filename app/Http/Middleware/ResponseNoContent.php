@@ -11,7 +11,8 @@ class ResponseNoContent
     {
         if (in_array($request->route()->getActionMethod(), ['update', 'destroy'])) {
             $response = $next($request);
-            if (is_numeric($response->content())) {
+
+            if ($response->getContent() === '1') {
                 return response()->noContent();
             }
         }

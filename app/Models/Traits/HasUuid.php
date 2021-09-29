@@ -22,7 +22,7 @@ trait HasUuid
         parent::boot();
 
         static::creating(function (Model $model) {
-            $model->setAttribute($model->getKeyName(), Str::uuid());
+            $model->setAttribute($model->getKeyName(), Str::uuid()->toString());
         });
     }
 }

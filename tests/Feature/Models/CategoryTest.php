@@ -19,7 +19,7 @@ class CategoryTest extends TestCase
             'description' => null
         ])->create();
 
-        $this->assertTrue(Str::isUuid($model->id->toString()));
+        $this->assertTrue(Str::isUuid($model->id));
         $this->assertFalse($model->is_active);
         $this->assertIsString($model->name);
         $this->assertNull($model->description);

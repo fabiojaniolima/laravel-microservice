@@ -18,7 +18,7 @@ class GenreTest extends TestCase
             'is_active' => false,
         ])->create();
 
-        $this->assertTrue(Str::isUuid($model->id->toString()));
+        $this->assertTrue(Str::isUuid($model->id));
         $this->assertFalse($model->is_active);
         $this->assertIsString($model->name);
     }

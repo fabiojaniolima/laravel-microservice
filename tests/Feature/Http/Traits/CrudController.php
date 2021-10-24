@@ -30,7 +30,7 @@ trait CrudController
 
     public function assertShowMethod(array $fieldStructure)
     {
-        $model = $this->model::factory(['name' => 'isso é um teste'])->create();
+        $model = $this->model::factory()->create();
         $response = $this->get(route($this->getRoutePrefix() . '.show', $model->id));
 
         $response

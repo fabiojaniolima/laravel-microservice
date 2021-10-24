@@ -8,7 +8,10 @@ trait CrudController
 {
     private function getRoutePrefix()
     {
-        return Str::lower(Str::plural(substr(strrchr($this->model, "\\"), 1)));
+        $className = class_basename($this->model);
+        $classNamePluralize = Str::plural($className);
+
+        return Str::snake($classNamePluralize, '-');
     }
 
     public function assertIndexMethod(array $fieldStructure)

@@ -4,69 +4,52 @@ namespace Tests\Feature\Http\Controller;
 
 use App\Models\Category;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Str;
+use Tests\Feature\Http\Traits\CrudController;
 use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, CrudController;
 
-    public function test_list()
+    private $model = Category::class;
+
+    public function test_index()
     {
-        Category::factory()->count(5)->create();
-
-        $response = $this->get(route('categories.index'));
-
-        $response
-            ->assertStatus(200)
-            ->assertJsonCount(5, 'data')
-            ->assertJsonStructure([
-                'data' => [
-                    [
-                        'id',
-                        'name',
-                        'is_active',
-                        'description',
-                        'deleted_at',
-                        'created_at',
-                        'updated_at'
-                    ]
-                ]
-            ]);
+        $this->assertIndexMethod([
+            'id',
+            'name',
+            'is_active',
+            'description',
+            'deleted_at',
+            'created_at',
+            'updated_at'
+        ]);
     }
 
     public function test_show()
     {
-        $model = Category::factory()->create();
-        $response = $this->get(route('categories.show', ['category' => $model->id]));
-
-        $response
-            ->assertStatus(200)
-            ->assertJsonStructure([
-                'id',
-                'name',
-                'is_active',
-                'description',
-                'deleted_at',
-                'created_at',
-                'updated_at'
-            ]);
+        $this->assertShowMethod([
+            'id',
+            'name',
+            'is_active',
+            'description',
+            'deleted_at',
+            'created_at',
+            'updated_at'
+        ]);
     }
 
     public function test_store()
     {
-        $response = $this->post(route('categories.store'), [
+        $this->assertStoreMethod([
             'name' => 'It is a test',
             'is_active' => false,
         ]);
+    }
 
-        $response
-            ->assertStatus(201)
-            ->assertJsonFragment([
-                'is_active' => false,
-                'name' => 'It is a test',
-            ]);
-        $this->assertTrue(Str::isUuid($response->json('id')));
+    public function test_destroy()
+    {
+        $this->assertDestroyMethod();
     }
 
     public function test_name_and_is_active_must_be_valid()
@@ -83,15 +66,5 @@ class CategoryTest extends TestCase
             ])->assertJsonFragment([
                 __('validation.boolean', ['attribute' => 'is active']),
             ]);
-    }
-
-    public function test_destroy()
-    {
-        $model = Category::factory()->create();
-
-        $response = $this->delete(route('categories.destroy', ['category' => $model->id]));
-
-        $response->assertStatus(204);
-        $this->assertNotNull($model->refresh()['deleted_at']);
     }
 }

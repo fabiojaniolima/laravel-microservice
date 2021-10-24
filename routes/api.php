@@ -25,5 +25,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('v1')->group(function() {
     Route::apiResource('/categories', CategoryController::class);
     Route::apiResource('/genres', GenreController::class);
+    Route::apiResource('/videos', VideoController::class);
     Route::apiResource('/cast-members', CastMemberController::class);
 });

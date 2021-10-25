@@ -1,0 +1,54 @@
+version: '3.7'
+
+services:
+    db:
+        container_name: micro-videos-db
+        image: mysql:8.0
+        environment:
+            MYSQL_USER: app_user
+            MYSQL_PASSWORD: secret-pw
+            MYSQL_ROOT_PASSWORD: secret-pw
+        restart: on-failure
+        ports:
+            - "3306:3306"
+        volumes:
+            - db-data:/var/lib/mysql
+            - ./.docker/mysql:/docker-entrypoint-initdb.d
+        healthcheck:
+            test: mysqladmin -u root -p'$$MYSQL_ROOT_PASSWORD' ping -h localhost
+            interval: 1s
+            timeout: 10s
+            start_period: 5s
+            retries: 30
+    app:
+        container_name: micro-videos-app
+        image: fabiojanio/php:8.0-alpine3.14
+        environment:
+            APP_ENV: $_APP_ENV
+            DB_HOST: $_DB_HOST
+            DB_PORT: $_DB_PORT
+            DB_DATABASE: $_DB_DATABASE
+            DB_USERNAME: $_DB_USERNAME
+            DB_PASSWORD: $_DB_PASSWORD
+        volumes:
+            - ./:/app
+        working_dir: /app
+        restart: on-failure
+        ports:
+            - "8083:80"
+        depends_on:
+            db:
+                condition: service_healthy
+        command: >
+            sh -c "composer install;
+            composer run post-root-package-install;
+            composer run post-create-project-cmd;
+            php artisan test"
+
+volumes:
+    db-data:
+
+networks:
+    default:
+        external:
+            name: cloudbuild

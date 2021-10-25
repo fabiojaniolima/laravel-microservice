@@ -1,0 +1,5 @@
+steps:
+
+  - id: 'Rodando docker-compose'
+    name: 'docker/compose:1.29.2'
+    args: ['-f', 'docker-compose-ci.yml', 'up']

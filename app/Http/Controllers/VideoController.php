@@ -21,9 +21,15 @@ class VideoController extends Controller
             'opened' => 'boolean',
             'rating' => 'required|in:' . implode(',', Video::RATING_LIST),
             'duration' => 'required|integer',
+            'categories_id' => 'required|array|exists:categories,id',
+            'genres_id' => 'required|array|exists:genres,id',
         ]);
 
-        return Video::create($request->all());
+        $data = Video::create($request->all());
+        $data->categories()->sync($request->get('categories_id'));
+        $data->genres()->sync($request->get('genres_id'));
+        $data->refresh();
+        return $data;
     }
 
     public function show(Video $video)
@@ -39,9 +45,16 @@ class VideoController extends Controller
             'opened' => 'boolean',
             'rating' => 'in:' . implode(',', Video::RATING_LIST),
             'duration' => 'integer',
+            'categories_id' => 'required|array|exists:categories,id',
+            'genres_id' => 'required|array|exists:genres,id',
         ]);
 
-        return $video->update($request->all());
+
+        $video->update($request->all());
+        $video->categories()->sync($request->get('categories_id'));
+        $video->genres()->sync($request->get('genres_id'));
+        $video->refresh();
+        return $video;
     }
 
     public function destroy(Video $video)
